@@ -33,6 +33,40 @@ class Field:
 #        initfield[9] = Block(1, 2, 2)
         self.field = Field.fold(initfield)
         self.addrandomblock()
+    
+    def checkgameover(self):
+        if len([x for x in self.flat() if type(x) is Block]) == 16:
+            for p in self.flat():
+                adjacents = self.adjacentcells(p)
+                for a in adjacents:
+                    if p.value == a.value:
+                        return False 
+        else:
+            return False 
+        return True 
+
+    def adjacentcells(self, block):
+        r = []
+
+        xbounds = range(0, len(self.field))
+        ybounds = range(0, len(self.field))
+
+        diffx = range(-1, 2, 2)
+        diffy = range(-1, 2, 2)
+
+        for x in diffx:
+            nx = block.x - x
+
+            if nx in xbounds:
+                r.append(self.field[block.y][nx])
+
+        for y in diffy:
+            ny = block.y - y
+
+            if ny in ybounds:
+                r.append(self.field[ny][block.x])
+
+        return r
 
     def move_upwards(self):
         for i in range(1, len(self.field)):
@@ -178,6 +212,23 @@ class Game:
     def __init__(self, board):
         self.board = board
 
+    def checkgamestate(self):
+        if (len([x for x in self.board.field.flat() if type(x) is Block and x.value == 2048]) >= 1) or self.checkgameover():
+            return False
+        else:
+            return True
+
+    def checkgameover(self):
+        return self.board.field.checkgameover()
+
+    def checkgameresult(self):
+        if len([x for x in self.board.field.flat() if type(x) is Block and x.value == 2048]) >= 1:
+            return True
+        elif self.checkgameover():
+            return False
+        else:
+            print("Some weird unexplainable error occured")
+
     def start(self):
         _running = True
         _round = 1
@@ -203,8 +254,11 @@ class Game:
             if d.lower() == "a":
                 self.board.field.move_left()
 
+
             for p in [x for x in self.board.field.flat() if type(x) is Block and x.isnew == True]:
                 p.isnew = False
+
+            _running = self.checkgamestate()
 
             if not len([x for x in self.board.field.flat() if type(x) is Block]) == 16:
                 self.board.field.addrandomblock()
@@ -212,6 +266,12 @@ class Game:
             print("\n")
             _round += 1
 
+        gameresult = self.checkgameresult()
+
+        if gameresult == True: # stylize these two messages
+            print("YOU WON!")
+        else:
+            print("YOU LOST!")
 
 def main():
     initrngseed = 85109213745050274563532823495687287
