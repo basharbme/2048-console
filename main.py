@@ -26,12 +26,9 @@ class Field:
     def new(self): # on call reset the field and add a random block
         initfield = []
         for i in range(16):
-            #initfield.append(Block(i % 4, int(i / 4), 0))
             initfield.append(" ")
-#        initfield[5] = Block(1, 1, 4)
-#        initfield[6] = Block(2, 1, 2)
-#        initfield[9] = Block(1, 2, 2)
         self.field = Field.fold(initfield)
+        self.addrandomblock()
         self.addrandomblock()
     
     def checkgameover(self):
